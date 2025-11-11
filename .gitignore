@@ -36,6 +36,7 @@
 *.exe
 *.out
 *.app
+app_odbc_launcher
 
 # debug information files
 *.dwo
