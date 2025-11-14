@@ -27,6 +27,11 @@ _EXTERN_ void*    (_DLLCALL_ *TC_GetTopConn4gl) ( short Type, short prefPort ); 
 _EXTERN_ short   (_DLLCALL_ *TC_m4GLConnect) ( void* who, char* toServer, char* conn_str, char* usrname );
 _EXTERN_ short   (_DLLCALL_ *TC_DisConnect4gl) ( void* who );
 
+
+// Definicao do tipo de ponteiro da funcao que serah carregada dinamicamente
+typedef int (* db_connect_ptr)(const char*);
+typedef int (* db_disconnect_ptr)();
+
 /**
  * @brief Inicializa a OpenSSL 3 estaticamente.
  * @return true se bem-sucedido.
@@ -64,6 +69,57 @@ bool initialize_openssl()
 
 int connect_and_run_sql()
 {
+  void* dbinterface_handle = nullptr;
+  const char* dlsym_error = nullptr;
+
+  if (!initialize_openssl()) 
+  {
+    return 1;
+  }  
+  
+  cout << "--- Carregando biblioteca dinamica (dbinterface.so) ---" << endl;
+  dbinterface_handle = dlopen("./libdbinterface.so", RTLD_NOW | RTLD_LOCAL | RTLD_DEEPBIND );
+  if( dbinterface_handle == nullptr )
+  {
+    std::cout << "Could not load library: " << dlerror() << std::endl;
+    return -1;
+  }
+
+  // Mapeamento das funcoes
+  db_connect_ptr db_connect_fn = (db_connect_ptr)dlsym(dbinterface_handle, "db_connect");
+  dlsym_error = dlerror();
+  if (dlsym_error) {
+      cerr << "ERRO FATAL: Nao foi possivel encontrar a funcao db_connect: " << dlsym_error << endl;
+      dlclose(dbinterface_handle);
+      return 1;
+  }
+  cout << "Funcao 'db_connect' mapeada com sucesso." << endl;
+
+  db_disconnect_ptr db_disconnect_fn = (db_disconnect_ptr)dlsym(dbinterface_handle, "db_disconnect");
+  dlsym_error = dlerror();
+  if (dlsym_error) {
+      cerr << "ERRO FATAL: Nao foi possivel encontrar a funcao db_disconnect: " << dlsym_error << endl;
+      dlclose(dbinterface_handle);
+      return 1;
+  }
+  cout << "Funcao 'db_disconnect' mapeada com sucesso." << endl;
+
+  // iniciando operacoes no banco
+  cout << "\n--- Iniciando o Modulo ODBC/SQL Server ---" << endl;
+  int result = db_connect_fn((const char*) "alala");
+
+  // Limpeza
+  cout << "\n--- Limpando recursos ---" << endl;
+  dlclose(dbinterface_handle);
+
+  if (result == 0) {
+      cout << "SUCESSO: Rotina completa executada sem falhas." << endl;
+  } else {
+      cerr << "FALHA: A rotina SQL retornou codigo de erro: " << result << endl;
+  }  
+
+/*  
+
   void* hLibrary = dlopen( "./dbsrv.so", RTLD_NOW | RTLD_LOCAL | RTLD_DEEPBIND );
 
   if (!initialize_openssl()) 
@@ -116,6 +172,7 @@ int connect_and_run_sql()
   
   
   dlclose( hLibrary );
-  
+ */
+
   return 0;
 }

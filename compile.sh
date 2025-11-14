@@ -53,6 +53,20 @@ cd ..
 echo "*** Copying libodbc_launcher.so..."
 cp -fv ${PWD}/lib/libodbc_launcher.so .
 
+echo "*** Entering directory lib_dbinterface..."
+cd lib_dbinterface
+
+echo "*** Build lib_dbinterface.so ..."
+g++ -std=c++17 -fPIC -shared dbinterface.cpp -o libdbinterface.so \
+    -I${PWD} \
+    -L${PWD} \
+    -ldl -lrt -lpthread 
+
+echo "*** Exiting directory lib_dbinterface..."
+cd ..
+
+echo "*** Copying lib_dbinterface.so..."
+cp -fv ${PWD}/lib_dbinterface/libdbinterface.so .    
 
 echo "*** Building app_odbc_launcher... "
 g++ -std=c++17 app/main.cpp -o app_odbc_launcher \

@@ -44,3 +44,6 @@ app_odbc_launcher
 # others
 *.ini
 *.log
+
+
+.vscode
