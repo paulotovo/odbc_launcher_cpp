@@ -24,13 +24,13 @@ The project focuses on leveraging the Microsoft ODBC Driver 18 (msodbcsql18) and
 
 #### Use OpenSSL1
 ```
-export USE_OPENSSL=1 \
+export USE_OPENSSL=1 
 export OPENSSL_ROOT="/home/user/openssl/1.1.1t/linux64/gcc-8.3.1"
 ```
 
 #### Use OpenSSL3
 ```
-export USE_OPENSSL=3 \
+export USE_OPENSSL=3 
 export OPENSSL_ROOT="/home/user/openssl/3.0.13/linux64/gcc-8.3.1"
 ```
 
@@ -46,7 +46,7 @@ export USE_DBSRV=1
 
 ### Build command
 ```
-chmod +x compile.sh \
+chmod +x compile.sh 
 ./compile.sh
 ```
 
@@ -56,13 +56,13 @@ chmod +x compile.sh \
 
 ### Default Mode
 ```
-export LD_LIBRARY_PATH=. \
+export LD_LIBRARY_PATH=. 
 ./app_odbc_launcher dsn  username password
 ```
 
 ### Loading external component DBSrv
 ```
-export LD_LIBRARY_PATH=. \
+export LD_LIBRARY_PATH=. 
 ./app_odbc_launcher server_ip DSN username
 ```
 
