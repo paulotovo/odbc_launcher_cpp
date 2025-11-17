@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# 1. Verifica se a variável NÃO está vazia/indefinida (-n)  
+if [[ -n "$USE_DBSRV" ]] && [[ "$USE_DBSRV" == "1" ]]; then
+    unset WITH_DBINTERFACE  
+    PARM_DBSRV=-DUSE_DBSRV
+    echo "*** Building using DBSRV"
+else
+    export WITH_DBINTERFACE=1
+    echo "*** Building using DBINTERFACE"
+fi
+
 # 1. Verifica se a variável NÃO está vazia/indefinida (-n)
 if [[ -n "$USE_OPENSSL" ]]; then    
     # 2. Se for definida, verifica se é 1 OU 3
@@ -34,7 +44,7 @@ cd lib
 echo "*** Build libodbc_launcher.so ..."
 
 if [[ -n "$USE_OPENSSL" ]]; then    
-    g++ -std=c++17 -DUSE_OPENSSL=${USE_OPENSSL} -fPIC -shared odbc_launcher.cpp -o libodbc_launcher.so \
+    g++ -std=c++17 ${PARM_DBSRV} -DUSE_OPENSSL=${USE_OPENSSL} -fPIC -shared odbc_launcher.cpp -o libodbc_launcher.so \
         -I${PWD} \
         -I${OPENSSL_INC} \
         -L${OPENSSL_LIB} \
@@ -42,7 +52,7 @@ if [[ -n "$USE_OPENSSL" ]]; then
         -lssl -lcrypto \
         -ldl -lrt -lpthread 
 else
-    g++ -std=c++17 -fPIC -shared odbc_launcher.cpp -o libodbc_launcher.so \
+    g++ -std=c++17 ${PARM_DBSRV} -fPIC -shared odbc_launcher.cpp -o libodbc_launcher.so \
         -I${PWD} \
         -L${PWD} \
         -ldl -lrt -lpthread 
@@ -53,23 +63,26 @@ cd ..
 echo "*** Copying libodbc_launcher.so..."
 cp -fv ${PWD}/lib/libodbc_launcher.so .
 
-echo "*** Entering directory lib_dbinterface..."
-cd lib_dbinterface
+# with dbinterface
+if [[ -n "$WITH_DBINTERFACE" ]]; then    
+    echo "*** Entering directory lib_dbinterface..."
+    cd lib_dbinterface
 
-echo "*** Build lib_dbinterface.so ..."
-g++ -std=c++17 -fPIC -shared dbinterface.cpp -o libdbinterface.so \
-    -I${PWD} \
-    -L${PWD} \
-    -ldl -lrt -lpthread 
+    echo "*** Build lib_dbinterface.so ..."
+    g++ -std=c++17 -fPIC -shared dbinterface.cpp -o libdbinterface.so \
+        -I${PWD} \
+        -L${PWD} \
+        -ldl -lrt -lpthread 
 
-echo "*** Exiting directory lib_dbinterface..."
-cd ..
+    echo "*** Exiting directory lib_dbinterface..."
+    cd ..
 
-echo "*** Copying lib_dbinterface.so..."
-cp -fv ${PWD}/lib_dbinterface/libdbinterface.so .    
+    echo "*** Copying lib_dbinterface.so..."
+    cp -fv ${PWD}/lib_dbinterface/libdbinterface.so .    
+fi
 
 echo "*** Building app_odbc_launcher... "
-g++ -std=c++17 app/main.cpp -o app_odbc_launcher \
+g++ -std=c++17 ${PARM_DBSRV} app/main.cpp -o app_odbc_launcher \
     -I${PWD}/lib \
     -L${PWD}/lib \
     -lodbc_launcher

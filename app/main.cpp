@@ -6,22 +6,44 @@
 
 using namespace std;
 
-
-
 /**
- * @brief Carrega a biblioteca ODBC dinamicamente e executa a funÃ§Ã£o.
+ * @brief Carrega a biblioteca ODBC dinamicamente e executa a funcao.
  */
-int main() 
+int main( int argc, char **argv )
 {
-    cout << "--- Carregando o app_odbc_launcher dinamicamente --- " << endl; 
-    // Chama direto a funcao da lib linkada dinamicamente
-    int result = connect_and_run_sql();
+  if( argc < 4 )
+  {
+    std::cout << "Invalid number of parameters." << std::endl;
+#ifdef USE_DBSRV    
+    std::cout << "Parameters: SERVER DSN USERNAME" << std::endl;
+#else
+    std::cout << "Parameters: DSN USERNAME PASSWORD" << std::endl;
+#endif
+    exit( 1 );
+  }
+  
+  std::string sParm1 = argv[1];
+  std::string sParm2 = argv[2];
+  std::string sParm3 = argv[3];
 
-    if (result == 0) {
-        cout << "SUCESSO: Rotina completa executada sem falhas." << endl;
-    } else {
-        cerr << "FALHA: A rotina SQL retornou codigo de erro: " << result << endl;
-    }
+  
+  int iRet = 0;
 
-    return result;
+  if( sParm1.empty() || sParm2.empty() || sParm3.empty() )
+  {
+    std::cout << "Invalid parameters informed." << std::endl;
+    return 1;
+  }
+
+  cout << "--- Carregando o app_odbc_launcher dinamicamente --- " << endl; 
+  // Chama direto a funcao da lib linkada dinamicamente
+  int result = connect_and_run_sql(sParm1.c_str(), sParm2.c_str(), sParm3.c_str());
+
+  if (result == 0) {
+      cout << "SUCESSO: Rotina completa executada sem falhas." << endl;
+  } else {
+      cerr << "FALHA: A rotina SQL retornou codigo de erro: " << result << endl;
+  }
+
+  return result;
 }
