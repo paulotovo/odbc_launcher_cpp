@@ -31,7 +31,7 @@ _EXTERN_ short   (_DLLCALL_ *TC_DisConnect4gl) ( void* who );
 #else
 
 // Definicao do tipo de ponteiro da funcao que serah carregada dinamicamente
-typedef int (* db_connect_ptr)(const char*);
+typedef int (* db_connect_ptr)(const char *DSN_NAME, const char *username, const char *password);
 typedef int (* db_disconnect_ptr)();
 
 #endif
@@ -180,7 +180,7 @@ int connect_and_run_sql(const char * pDSN, const char * pUser, const char * pPwd
 
   // iniciando operacoes no banco
   cout << "\n--- Iniciando o Modulo ODBC/SQL Server ---" << endl;
-  int result = db_connect_fn((const char*) "alala");
+  int result = db_connect_fn(pDSN, pUser, pPwd);
 
   // Limpeza
   cout << "\n--- Limpando recursos ---" << endl;

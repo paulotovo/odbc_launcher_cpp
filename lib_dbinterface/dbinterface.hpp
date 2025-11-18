@@ -31,7 +31,7 @@ bool load_odbc_symbols();
  * @param dbName Nome do banco de dados.
  * @return 0 em caso de sucesso, -1 em caso de falha.
  */
-int db_connect(const char *dbName);
+int db_connect(const char *DSN_NAME, const char *username, const char *password );
 
 /**
  * @brief Simula a desconexão do banco de dados.

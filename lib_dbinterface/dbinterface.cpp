@@ -6,11 +6,8 @@
 #include <iomanip> 
 using namespace std;
 
-// Nomes de ConexÃ£o e Tabela
-const char* DSN_NAME = "utlogix_sql"; 
+// Tabela
 const char* TABLE_NAME = "TabelaTeste"; 
-const char* username = "totvsvmtests";
-const char* password = "totvs@123456";
 
 // DefiniÃ§Ãµes de Handle para ODBC (Inicializados como NULL)
 SQLHENV env = SQL_NULL_HENV; 
@@ -206,7 +203,7 @@ bool load_odbc_symbols()
 }
 
 // Implementação da função de conexão (linkagem C)
-int db_connect(const char *dbName) 
+int db_connect(const char *DSN_NAME, const char *username, const char *password ) 
 {
   SQLRETURN ret;
   string sql;
